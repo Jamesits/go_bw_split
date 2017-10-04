@@ -26,8 +26,8 @@ ESP8266WebServer server(80);
 
 void handleRoot() {
   digitalWrite(PIN_LED, LOW);
-  char buf[200] = {0};
-  sprintf(buf, "<h1>当前计数：%u%s</h1><script>setTimeout('location.reload(true);'," PAGE_REFRESH_INTERVAL ");</script>", count, (count < FINISH_COUNT ? "" : "，已完成！"));
+  char buf[300] = {0};
+  sprintf(buf, "<html><head><meta charset=\"UTF-8\"></head><body><h1>当前计数：%u%s</h1><script>setTimeout('location.reload(true);'," PAGE_REFRESH_INTERVAL ");</script></body></html>", count, (count < FINISH_COUNT ? "" : "，已完成！"));
   server.send(200, "text/html", buf);
   digitalWrite(PIN_LED, HIGH);
 }
