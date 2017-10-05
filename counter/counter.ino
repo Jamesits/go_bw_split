@@ -22,14 +22,25 @@ unsigned int count = 0;
 const char *ssid = "go_spliter";
 const char *password = "12345678";
 
+// embedded files
+const char background[] PROGMEM = {
+#include "data/background.png.h"
+};
+
 ESP8266WebServer server(80);
 
 void handleRoot() {
   digitalWrite(PIN_LED, LOW);
-  char buf[300] = {0};
-  sprintf(buf, "<html><head><meta charset=\"UTF-8\"></head><body><h1>当前计数：%u%s</h1><script>setTimeout('location.reload(true);'," PAGE_REFRESH_INTERVAL ");</script></body></html>", count, (count < FINISH_COUNT ? "" : "，已完成！"));
+  char buf[1000] = {0};
+  sprintf(buf, "<html><head><meta charset=\"UTF-8\"></head><body style=\"background: white url(\'background.png\') left top/1680px 987px no-repeat fixed\"><h1 style=\"position:fixed;left:280px;top:170px;font-size:26px;text-align:center;\">%u</h1><h1 style=\"position:fixed;left:250px;top:210px;font-size:20px;text-align:center;\">%s</h1><script>window.onload=function(){setTimeout('location.reload(true);'," PAGE_REFRESH_INTERVAL ");};</script></body></html>", count, (count < FINISH_COUNT ? "" : "，已完成！"));
+  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate", false);
   server.send(200, "text/html", buf);
   digitalWrite(PIN_LED, HIGH);
+}
+
+void handleBackground() {
+  server.sendHeader("Cache-Control", "max-age=31536000", false);
+  server.send_P(200, "image/png", background, sizeof(background));
 }
 
 void setup()  {
@@ -46,6 +57,7 @@ void setup()  {
   Serial.print("AP IP address: ");
   Serial.println(myIP);
   server.on("/", handleRoot);
+  server.on("/background.png", handleBackground);
   server.begin();
   Serial.println("HTTP server started");
  
